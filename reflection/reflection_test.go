@@ -76,14 +76,6 @@ func TestWalk(t *testing.T) {
 			},
 			[]string{"London", "Reykjavík"},
 		},
-		{
-			"maps",
-			map[string]string{
-				"Cow":   "Moo",
-				"Sheep": "Baa",
-			},
-			[]string{"Moo", "Baa"},
-		},
 	}
 
 	for _, test := range cases {
@@ -112,6 +104,27 @@ func TestWalk(t *testing.T) {
 
 		assertContains(t, got, "Moo")
 		assertContains(t, got, "Baa")
+	})
+
+	t.Run("with channels", func(t *testing.T) {
+		aChannel := make(chan Profile)
+
+		go func() {
+			aChannel <- Profile{33, "Berlin"}
+			aChannel <- Profile{34, "Munich"}
+			close(aChannel)
+		}()
+
+		var got []string
+		want := []string{"Berlin", "Munich"}
+
+		walk(aChannel, func(input string) {
+			got = append(got, input)
+		})
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
 	})
 }
 
