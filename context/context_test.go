@@ -1,9 +1,11 @@
 package context
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestServer(t *testing.T) {
@@ -25,20 +27,22 @@ func TestServer(t *testing.T) {
 		// store.assertWasNotCancelled()
 	})
 
-	// t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
-	// 	store := &SpyStore{response: data, t: t}
-	// 	svr := Server(store)
+	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
+		store := &SpyStore{response: data, t: t}
+		svr := Server(store)
 
-	// 	request := httptest.NewRequest(http.MethodGet, "/", nil)
+		request := httptest.NewRequest(http.MethodGet, "/", nil)
 
-	// 	cancellingCtx, cancel := context.WithCancel(request.Context())
-	// 	time.AfterFunc(5*time.Millisecond, cancel)
-	// 	request = request.WithContext(cancellingCtx)
+		cancellingCtx, cancel := context.WithCancel(request.Context())
+		time.AfterFunc(5*time.Millisecond, cancel)
+		request = request.WithContext(cancellingCtx)
 
-	// 	response := httptest.NewRecorder()
+		response := &SpyResponseWriter{}
 
-	// 	svr.ServeHTTP(response, request)
+		svr.ServeHTTP(response, request)
 
-	// 	store.assertWasCancelled()
-	// })
+		if response.written {
+			t.Error("a response should not have been written")
+		}
+	})
 }
