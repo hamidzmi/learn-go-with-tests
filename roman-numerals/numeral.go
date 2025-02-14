@@ -3,7 +3,7 @@ package romannumerals
 import "strings"
 
 type RomanNumeral struct {
-	Value  int
+	Value  uint16
 	Symbol string
 }
 
@@ -23,7 +23,7 @@ var allRomanNumerals = []RomanNumeral{
 	{1, "I"},
 }
 
-func ConvertToRoman(arabic int) string {
+func ConvertToRoman(arabic uint16) string {
 	var result strings.Builder
 
 	for _, numeral := range allRomanNumerals {
@@ -36,8 +36,8 @@ func ConvertToRoman(arabic int) string {
 	return result.String()
 }
 
-func convertToArabic(roman string) int {
-	total := 0
+func convertToArabic(roman string) uint16 {
+	var total uint16
 
 	for _, numeral := range allRomanNumerals {
 		for strings.HasPrefix(roman, numeral.Symbol) {
